@@ -1,6 +1,10 @@
 package student
 
-import "sample-api/services"
+import (
+	"net/http"
+
+	"sample-api/services"
+)
 
 type handler struct {
 	service services.Student
@@ -21,4 +25,32 @@ type handler struct {
 // New is the factory function for handler that injects service dependency.
 func New(service services.Student) handler {
 	return handler{service: service}
+}
+
+/*
+	Signature for Handler: func (w http.ResponseWriter, r *http.Request)
+
+	https://pkg.go.dev/github.com/gorilla/mux#Router.HandleFunc
+	The router's HandleFunc method takes a path [string] and a handler [func (w http.ResponseWriter, r *http.Request)]
+	and routes requests to the respective handlers based on matching path.
+*/
+
+func (h handler) Create(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (h handler) GetAll(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (h handler) Get(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (h handler) Update(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (h handler) Delete(w http.ResponseWriter, r *http.Request) {
+
 }
