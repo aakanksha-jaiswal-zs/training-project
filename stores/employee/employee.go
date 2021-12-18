@@ -35,21 +35,21 @@ func New(db *sql.DB) stores.Employee {
 }
 
 func (s store) Create(employee models.Employee) (models.Employee, error) {
-
+	return models.Employee{}, nil
 }
 
 func (s store) GetAll(filter filters.Employee) ([]models.Employee, error) {
-
+	return nil, nil
 }
 
 func (s store) Get(id int64) (models.Employee, error) {
-
+	return models.Employee{}, nil
 }
 
 func (s store) Update(employee models.Employee) (models.Employee, error) {
-
+	return models.Employee{}, nil
 }
 
 func (s store) Delete(id int64) error {
-
+	return nil
 }

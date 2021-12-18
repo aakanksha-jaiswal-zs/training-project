@@ -34,21 +34,21 @@ func New(db *sql.DB) stores.Student {
 }
 
 func (s store) Create(student models.Student) (models.Student, error) {
-
+	return models.Student{}, nil
 }
 
 func (s store) GetAll(filter filters.Student) ([]models.Student, error) {
-
+	return nil, nil
 }
 
 func (s store) Get(id int64) (models.Student, error) {
-
+	return models.Student{}, nil
 }
 
 func (s store) Update(student models.Student) (models.Student, error) {
-
+	return models.Student{}, nil
 }
 
 func (s store) Delete(id int64) error {
-
+	return nil
 }
