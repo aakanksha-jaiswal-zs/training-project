@@ -2,8 +2,10 @@ package employee
 
 import (
 	"database/sql"
+	"reflect"
 	"testing"
 
+	"sample-api/filters"
 	"sample-api/models"
 	"sample-api/stores"
 )
@@ -20,7 +22,7 @@ func TestEmployee_Create(t *testing.T) {
 	tests := []struct {
 		desc  string
 		input models.Employee
-		id    int64 // output
+		id    int64
 	}{
 		{"create with missing optional fields", models.Employee{Name: "Joey", Role: models.NonFaculty}, 1},
 		{"create with all fields", models.Employee{Name: "Jane", Designation: "Admin", Role: models.NonFaculty}, 2},
@@ -65,7 +67,57 @@ func TestEmployee_CreateError(t *testing.T) {
 }
 
 func TestEmployee_GetAll(t *testing.T) {
+	s := initializeTests()
 
+	employees := []models.Employee{
+		{ID: 10, Name: "Bryce", Designation: "Accountant", Role: models.NonFaculty},
+		{ID: 20, Name: "Clay", Designation: "Registrar", Role: models.NonFaculty},
+		{ID: 12, Name: "Hannah", Designation: "Assistant Professor"},
+	}
+
+	tests := []struct {
+		desc   string
+		filter filters.Employee
+		output []models.Employee
+	}{
+		{"list all employees", filters.Employee{}, employees},
+		{"list all non-faculty employees", filters.Employee{Role: models.NonFaculty}, employees[:2]},
+	}
+
+	for i, tc := range tests {
+		output, err := s.GetAll(tc.filter)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+
+		if !reflect.DeepEqual(tc.output, output) {
+			t.Errorf("TEST[%d], failed: %s\nExpected: %v,\nGot: %v", i, tc.desc, tc.output, output)
+		}
+	}
+}
+
+func TestEmployee_GetAllError(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc   string
+		filter filters.Employee
+	}{
+		{"database error", filters.Employee{}},
+	}
+
+	for i, tc := range tests {
+		output, err := s.GetAll(tc.filter)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+
+		if output != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil,\nGot: %v", i, tc.desc, output)
+		}
+	}
 }
 
 func TestEmployee_Get(t *testing.T) {

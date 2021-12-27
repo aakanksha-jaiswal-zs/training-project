@@ -2,8 +2,10 @@ package student
 
 import (
 	"database/sql"
+	"reflect"
 	"testing"
 
+	"sample-api/filters"
 	"sample-api/models"
 	"sample-api/stores"
 )
@@ -56,7 +58,57 @@ func TestStudent_CreateError(t *testing.T) {
 }
 
 func TestStudent_GetAll(t *testing.T) {
+	s := initializeTests()
 
+	students := []models.Student{
+		{EnrollmentNumber: 10, Name: "Bryce", CurrentSemester: 2, CGPA: 5.8},
+		{EnrollmentNumber: 20, Name: "Clay", CurrentSemester: 2, CGPA: 8.8},
+		{EnrollmentNumber: 12, Name: "Hannah", CurrentSemester: 4, CGPA: 9.0},
+	}
+
+	tests := []struct {
+		desc   string
+		filter filters.Student
+		output []models.Student
+	}{
+		{"list all students", filters.Student{}, students},
+		{"list students of first year", filters.Student{Year: 1}, students[:2]},
+	}
+
+	for i, tc := range tests {
+		output, err := s.GetAll(tc.filter)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+
+		if !reflect.DeepEqual(tc.output, output) {
+			t.Errorf("TEST[%d], failed: %s\nExpected: %v,\nGot: %v", i, tc.desc, tc.output, output)
+		}
+	}
+}
+
+func TestStudent_GetAllError(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc   string
+		filter filters.Student
+	}{
+		{"database error", filters.Student{}},
+	}
+
+	for i, tc := range tests {
+		output, err := s.GetAll(tc.filter)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+
+		if output != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil,\nGot: %v", i, tc.desc, output)
+		}
+	}
 }
 
 func TestStudent_Get(t *testing.T) {
