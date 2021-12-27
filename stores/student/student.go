@@ -33,7 +33,7 @@ func New(db *sql.DB) stores.Student {
 	return store{db: db}
 }
 
-func (s store) Create(student models.Student) (int64, error) {
+func (s store) Create(student models.Student) error {
 
 }
 

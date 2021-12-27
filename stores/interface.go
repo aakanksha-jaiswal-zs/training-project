@@ -14,7 +14,7 @@ type Employee interface {
 }
 
 type Student interface {
-	Create(student models.Student) (int64, error)
+	Create(student models.Student) error
 	GetAll(filter filters.Student) ([]models.Student, error)
 	Get(id int64) (models.Student, error)
 	Update(student models.Student) error
