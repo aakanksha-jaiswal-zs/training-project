@@ -121,7 +121,51 @@ func TestEmployee_GetAllError(t *testing.T) {
 }
 
 func TestEmployee_Get(t *testing.T) {
+	s := initializeTests()
 
+	tests := []struct {
+		desc   string
+		id     int64
+		output *models.Employee
+	}{
+		{"get employee with ID 10", 10, &models.Employee{ID: 10, Name: "Bryce", Designation: "Accountant", Role: models.NonFaculty}},
+	}
+
+	for i, tc := range tests {
+		output, err := s.Get(tc.id)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+
+		if !reflect.DeepEqual(tc.output, output) {
+			t.Errorf("TEST[%d], failed: %s\nExpected: %v,\nGot: %v", i, tc.desc, tc.output, output)
+		}
+	}
+}
+
+func TestEmployee_GetError(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc string
+		id   int64
+	}{
+		{"db error", 20},
+		{"entity does not exist", 999},
+	}
+
+	for i, tc := range tests {
+		output, err := s.Get(tc.id)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+
+		if !reflect.DeepEqual(models.Employee{}, output) {
+			t.Errorf("TEST[%d], failed: %s\nExpected: %v ,\nGot: %v", i, tc.desc, models.Employee{}, output)
+		}
+	}
 }
 
 func TestEmployee_Update(t *testing.T) {
