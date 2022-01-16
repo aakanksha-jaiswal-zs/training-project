@@ -126,9 +126,9 @@ func TestEmployee_Get(t *testing.T) {
 	tests := []struct {
 		desc   string
 		id     int64
-		output *models.Employee
+		output models.Employee
 	}{
-		{"get employee with ID 10", 10, &models.Employee{ID: 10, Name: "Bryce", Designation: "Accountant", Role: models.NonFaculty}},
+		{"get employee with ID 10", 10, models.Employee{ID: 10, Name: "Bryce", Designation: "Accountant", Role: models.NonFaculty}},
 	}
 
 	for i, tc := range tests {
@@ -138,7 +138,7 @@ func TestEmployee_Get(t *testing.T) {
 			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
 		}
 
-		if !reflect.DeepEqual(tc.output, output) {
+		if output != tc.output {
 			t.Errorf("TEST[%d], failed: %s\nExpected: %v,\nGot: %v", i, tc.desc, tc.output, output)
 		}
 	}
@@ -162,16 +162,88 @@ func TestEmployee_GetError(t *testing.T) {
 			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
 		}
 
-		if !reflect.DeepEqual(models.Employee{}, output) {
-			t.Errorf("TEST[%d], failed: %s\nExpected: %v ,\nGot: %v", i, tc.desc, models.Employee{}, output)
+		if output != (models.Employee{}) {
+			t.Errorf("TEST[%d], failed: %s\nExpected: %v,\nGot: %v", i, tc.desc, models.Employee{}, output)
 		}
 	}
 }
 
-func TestEmployee_Update(t *testing.T) {
+func TestStudent_Update(t *testing.T) {
+	s := initializeTests()
 
+	tests := []struct {
+		desc  string
+		input models.Employee
+	}{
+		{"success case", models.Employee{ID: 10, Name: "Bryce Walker", Designation: "Accountant", Role: models.NonFaculty}},
+		{"update without body", models.Employee{ID: 20}},
+		{"empty update", models.Employee{}},
+	}
+
+	for i, tc := range tests {
+		err := s.Update(tc.input)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+	}
 }
 
-func TestEmployee_Delete(t *testing.T) {
+func TestStudent_UpdateError(t *testing.T) {
+	s := initializeTests()
 
+	tests := []struct {
+		desc  string
+		input models.Employee
+	}{
+		{"database error", models.Employee{ID: 10, Designation: "Accountant"}},
+		{"record does not exist in database", models.Employee{ID: 999, Name: "Clay Jensen"}},
+	}
+
+	for i, tc := range tests {
+		err := s.Update(tc.input)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+	}
+}
+
+func TestStudent_Delete(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc string
+		id   int64
+	}{
+		{"successful deletion", 1},
+	}
+
+	for i, tc := range tests {
+		err := s.Delete(tc.id)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+	}
+}
+
+func TestStudent_DeleteError(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc string
+		id   int64
+	}{
+		{"database error", 1},
+		{"record does not exist in database", 999},
+	}
+
+	for i, tc := range tests {
+		err := s.Delete(tc.id)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+	}
 }

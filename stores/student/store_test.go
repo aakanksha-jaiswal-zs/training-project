@@ -112,13 +112,129 @@ func TestStudent_GetAllError(t *testing.T) {
 }
 
 func TestStudent_Get(t *testing.T) {
+	s := initializeTests()
 
+	tests := []struct {
+		desc   string
+		id     int64
+		output models.Student
+	}{
+		{"get student with ID 1", 1, models.Student{EnrollmentNumber: 1, Name: "John Doe", CurrentSemester: 4}},
+	}
+
+	for i, tc := range tests {
+		output, err := s.Get(tc.id)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+
+		if output != tc.output {
+			t.Errorf("TEST[%d], failed: %s\nExpected: %v,\nGot: %v", i, tc.desc, tc.output, output)
+		}
+	}
+}
+
+func TestStudent_GetError(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc string
+		id   int64
+	}{
+		{"database error", 2},
+		{"entity not found error", 3},
+	}
+
+	for i, tc := range tests {
+		output, err := s.Get(tc.id)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+
+		if output != (models.Student{}) {
+			t.Errorf("TEST[%d], failed: %s\nExpected: %v,\nGot: %v", i, tc.desc, models.Student{}, output)
+		}
+	}
 }
 
 func TestStudent_Update(t *testing.T) {
+	s := initializeTests()
 
+	tests := []struct {
+		desc  string
+		input models.Student
+	}{
+		{"success case", models.Student{EnrollmentNumber: 1, Name: "James", CurrentSemester: 6}},
+		{"update without body", models.Student{EnrollmentNumber: 2}},
+		{"empty update", models.Student{}},
+	}
+
+	for i, tc := range tests {
+		err := s.Update(tc.input)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+	}
+}
+
+func TestStudent_UpdateError(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc  string
+		input models.Student
+	}{
+		{"database error", models.Student{EnrollmentNumber: 1, Name: "James", CurrentSemester: 6}},
+		{"record does not exist in database", models.Student{EnrollmentNumber: 1, Name: "James", CurrentSemester: 6}},
+	}
+
+	for i, tc := range tests {
+		err := s.Update(tc.input)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+	}
 }
 
 func TestStudent_Delete(t *testing.T) {
+	s := initializeTests()
 
+	tests := []struct {
+		desc string
+		id   int64
+	}{
+		{"successful deletion", 1},
+	}
+
+	for i, tc := range tests {
+		err := s.Delete(tc.id)
+
+		if err != nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: nil, Got: %v", i, tc.desc, err)
+		}
+	}
+}
+
+func TestStudent_DeleteError(t *testing.T) {
+	s := initializeTests()
+
+	tests := []struct {
+		desc string
+		id   int64
+	}{
+		{"database error", 1},
+		{"record does not exist in database", 999},
+	}
+
+	for i, tc := range tests {
+		err := s.Delete(tc.id)
+
+		if err == nil {
+			t.Errorf("TEST[%d], failed: %s\nExpected: error, Got: nil", i, tc.desc)
+		}
+	}
 }
